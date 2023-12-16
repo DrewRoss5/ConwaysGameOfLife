@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     int x, y; // the integers to define the size of the grid
     // validate and parse the two arguments
     if (argc != 4){
-        std::cout << "This program accepts exactly three arguments, please run it again with two arguments" << std::endl;
+        std::cout << "This program accepts exactly three arguments, please run it again with three arguments" << std::endl;
         return -1;
     }
     try{
