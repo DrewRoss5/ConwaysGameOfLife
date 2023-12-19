@@ -24,7 +24,7 @@ int main(int argc, char** argv){
     std::ofstream fileStream(fileName);
     if(fileStream.good()){
         // write the default rules and provided size to the file
-        fileStream << x << ", " << y << "\n2;4;3\n";
+        fileStream << x << ", " << y << "\n2;3;3\n";
         // write a blank line of size x for y rows
         for (int i = 0; i < y; i++){
             for (int j = 0; j < x; j++)
