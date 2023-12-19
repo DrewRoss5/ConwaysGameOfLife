@@ -21,6 +21,7 @@ int main(int argc, char** argv){
             simulationSpeed = std::stoi(speedStr);
             if (simulationSpeed < 1 || simulationSpeed > 100){
                 std::cout << "Please provide an integer between 1 and 100" << std::endl;
+                simulationSpeed = 0;
             }
         }
         catch (...){
