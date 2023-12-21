@@ -14,11 +14,11 @@ namespace life{
             int reproduction_;
             int generation_;
             bool active_;
-            std::vector<std::string> cellRows_;
+            std::vector<std::vector<bool>> cellRows_;
         public:
-            Game(int width, int height, std::vector<int> rules, std::vector<std::string> cells);
-            bool isCellAlive(int x, int y);
-            void displayCells();
+            Game(int width, int height, std::vector<int> rules, std::vector<std::vector<bool>> cells);
+            bool getCell(int x, int y);
+            void displayCells() const;
             void updateCells();
             //getter functions
             int getWidth() const {return width_;}
