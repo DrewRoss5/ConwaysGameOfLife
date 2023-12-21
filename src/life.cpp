@@ -28,7 +28,7 @@ life::Game life::readStateFile(std::string fileName){
     // game variables to be defined
     int width;
     int height;
-    std::vector<std::string> cells;
+    std::vector<std::vector<bool>> cells;
     // read each line from the given file
     std::ifstream fileStream(fileName);
     std::vector<std::string> lines;
@@ -73,10 +73,10 @@ life::Game life::readStateFile(std::string fileName){
     }
     // parse the game map
     char chr;
-    std::string row;
+    std::vector<bool> row;
     std::string rowIn;
     for (int i = 2; i < lines.size(); i++){
-        row = "";
+        row.clear();
         rowIn = lines.at(i);
         // validate the length of the row, and throw an error if it's invalid
         if (rowIn.length() != width)
@@ -86,10 +86,10 @@ life::Game life::readStateFile(std::string fileName){
             chr = rowIn.at(j);
             switch (chr){
                 case 'O':
-                    row += 'O';
+                    row.push_back(true);
                     break;
                 case '.':
-                    row += ' '; // dead cells are displayed as blank space in the game, which is why a dot is changed to a blank space.
+                    row.push_back(false); // dead cells are displayed as blank space in the game, which is why a dot is changed to a blank space.
                     break;
                 default:
                     throw std::runtime_error("Invalid game state file - illegal character: " + chr);
@@ -102,7 +102,7 @@ life::Game life::readStateFile(std::string fileName){
 }
 
 // general constructor for the Game class
-life::Game::Game(int width, int height, std::vector<int> rules, std::vector<std::string> cells){
+life::Game::Game(int width, int height, std::vector<int> rules, std::vector<std::vector<bool>> cells){
     generation_ = 0;
     active_ = true;
     width_ = width;
@@ -116,14 +116,18 @@ life::Game::Game(int width, int height, std::vector<int> rules, std::vector<std:
 }
 
 // returns if a cell is alive based on its character
-bool life::Game::isCellAlive(int x, int y){
-    return (cellRows_[x][y] == 'O') ? true : false;
+bool life::Game::getCell(int x, int y){
+    return cellRows_[x][y];
 }
 
 // displays the current cells
-void life::Game::displayCells(){
-    for (std::string row : cellRows_){
-        std::cout << row << std::endl;
+void life::Game::displayCells() const{
+    for (std::vector<bool> row : cellRows_){
+        for (bool cell : row){
+            std::cout << (cell ? "O" : " "); 
+        }
+        std::cout << std::endl;
+        
     }
     std::cout << "GEN: " << generation_ << std::endl;
 }
@@ -134,18 +138,18 @@ void life::Game::updateCells(){
     int neighbors;
     int updates = 0;
     // create a copy of the board to update the board to
-    std::vector<std::string> newCells = cellRows_;
+    std::vector<std::vector<bool>> newCells = cellRows_;
     for (int y = 0; y < height_; y++){
         for (int x = 0; x < width_; x++){
             neighbors = getNeighbors(x, y);
              // if the cell is alive, mark the cell as dead if its neighbor count is lower than the underpopulation threshold, or if its neighbor count is higher than the overpopulation threshold
-            if (isCellAlive(x, y) && (neighbors < underpop_ || neighbors > overpop_)) {
-                newCells[x][y] = ' ';
+            if (getCell(x, y) && (neighbors < underpop_ || neighbors > overpop_)) {
+                newCells[x][y] = false;
                 updates++;
             }
             // if the cell is dead, make it alive if it has the requisite number of neighbors
-            else if (!isCellAlive(x, y) && neighbors == reproduction_){
-                newCells[x][y] = 'O';
+            else if (!getCell(x, y) && neighbors == reproduction_){
+                newCells[x][y] = true;
                 updates++;
             }
         }
@@ -170,25 +174,25 @@ int life::Game::getNeighbors(int x, int y){
     // check if there are any cells above this cell and check the cell directly above it so
     if (y != 0){
         topIndex--;
-        if (isCellAlive(x, topIndex)) 
+        if (getCell(x, topIndex)) 
             neighbors++;
     }
     // check if there are any cells below this cell and check the cell below it so
     if (y != height_ - 1){
         bottomIndex = y+1;
-        if (isCellAlive(x, bottomIndex))
+        if (getCell(x, bottomIndex))
             neighbors++;
     }
     // check all cells to the left of this cell if it isn't the leftmost cell
     if (x != 0){
         for (int i = topIndex; i <= bottomIndex; i++)
-            if (isCellAlive(x-1, i))
+            if (getCell(x-1, i))
                 neighbors++;
     }
     // check all cells to the right of this cell if it isn't the rightmost cell
     if (x != width_ - 1){
         for (int i = topIndex; i <= bottomIndex; i++)
-            if (isCellAlive(x+1, i))
+            if (getCell(x+1, i))
                 neighbors++;
     }
     return neighbors;
