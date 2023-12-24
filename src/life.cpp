@@ -164,7 +164,7 @@ void life::Game::updateCells(){
 // getter methods
 // gets the number of live neighbors adjacent to a cell in a given positon, returns -1 if the position doesn't exist
 int life::Game::getNeighbors(int x, int y){
-    if (x >= height_ || y >= height_ || x <= 0 || y <= 0){
+    if (x >= width_ || y >= height_ || x < 0 || y < 0){
         return -1;
     }
     int neighbors = 0;
