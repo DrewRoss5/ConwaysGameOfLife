@@ -36,25 +36,29 @@ life::Game life::readStateFile(std::string fileName){
         std::string lineBuf;
         while(std::getline(fileStream, lineBuf))
             lines.push_back(lineBuf);
-        fileStream.close();
     }
     else{
-        fileStream.close();
+        std::cout << "Invalid game state file -  File could not be read." << std::endl;
         throw std::runtime_error("Invalid game state file -  File could not be read.");
     }
+    fileStream.close();
     // porse the width and height of the game grid
     std::vector<std::string> dimensions = life::splitStr(lines[0], ", ");
-    if (dimensions.size() != 2)
+    if (dimensions.size() != 2){
+        std::cout << "Invalid game state file - invalid game size." << std::endl;
         throw std::runtime_error("Invalid game state file - invalid game size.");
+    }   
     try{
         width = std::stoi(dimensions[0]);
         height = std::stoi(dimensions[1]);
     }
     catch (...){
+        std::cout << "Invalid game state file - invalid game size." << std::endl;
         throw std::runtime_error("Invalid game state file - invalid game size.");
     }
        // validate the number of lines (should be the specified height of the grid + 2) and raise an error if it's invalid
     if (lines.size() != height + 2){
+        std::cout << "Invalid game state file - too many or too few rows" << std::endl;
         throw std::runtime_error("Invalid game state file - too many or too few rows");
     }
      // parse the game's rules
@@ -62,13 +66,16 @@ life::Game life::readStateFile(std::string fileName){
     try{
       
         std::vector<std::string> ruleStrs = life::splitStr(lines[1], ";");
-        if (ruleStrs.size() != 3)
+        if (ruleStrs.size() != 3){
+            std::cout << "Invalid game state file - invalid game rules." << std::endl;
             throw std::runtime_error("Invalid game state file - invalid game rules.");
+        }
         // get the range of survival condtions
         std::vector<std::string> survivalStrs = splitStr(ruleStrs[1], "-");
         rules = {std::stoi(ruleStrs[0]), std::stoi(ruleStrs[1]), std::stoi(ruleStrs[2])};
     }
      catch (...){
+        std::cout << "Invalid game state file - invalid game rules." << std::endl;
         throw std::runtime_error("Invalid game state file - invalid game rules.");
     }
     // parse the game map
@@ -79,8 +86,11 @@ life::Game life::readStateFile(std::string fileName){
         row.clear();
         rowIn = lines.at(i);
         // validate the length of the row, and throw an error if it's invalid
-        if (rowIn.length() != width)
-            throw std::runtime_error("Invalid game state file - Invalid row size in row " + i-2);
+        if (rowIn.length() != width){
+            int rowNum = i-2;
+            std::cout << "Invalid game state file - Invalid row size in row " << rowNum << std::endl;
+            throw std::runtime_error("Invalid game state file - Invalid row size in row " + rowNum);
+        }
         // add each character to the row
         for (int j = 0; j < width; j++){
             chr = rowIn.at(j);
@@ -92,6 +102,7 @@ life::Game life::readStateFile(std::string fileName){
                     row.push_back(false); // dead cells are displayed as blank space in the game, which is why a dot is changed to a blank space.
                     break;
                 default:
+                    std::cout << "Invalid game state file - illegal character: " << chr;
                     throw std::runtime_error("Invalid game state file - illegal character: " + chr);
                     break;
             }
@@ -154,6 +165,8 @@ void life::Game::updateCells(){
             }
         }
     }
+    // check if the grid to needs to be expanded vertically 
+    // check on the top
     // mark the game "inactive" if no transformations occured
     if (!updates){
         active_ = false;
