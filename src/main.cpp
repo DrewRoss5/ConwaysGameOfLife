@@ -4,11 +4,12 @@
 #include "life.h"
 
 // determine the system call to make to clear the screen depending on the user's OS
-#ifdef _WIN32
+#ifdef WIN32
     const char* clear = "cls";
 #else
     const char* clear = "clear";
 #endif
+
 
 int main(int argc, char** argv){
     // determine the desired simulation speed, the time each frame should take in tens of milliseconds 
@@ -29,18 +30,27 @@ int main(int argc, char** argv){
         }
     }
     while (simulationSpeed == 0);
-    
+    // validate a game state file was provided
+    if (argc != 2){
+        std::cout << "Error - This program accepts exactly one argument" << std::endl;
+        return -1;
+    }
+      // attempt to create a game from the provided game state file
+    std::string gameStateFile = argv[1];
+    life::Game game;
     try{
-        life::Game game = life::readStateFile("testfile.txt");
-        while (game.getActive()){
-            system(clear);
-            game.displayCells();
-            game.updateCells();
-            std::this_thread::sleep_for(std::chrono::milliseconds(simulationSpeed * 10));   
-        }
-        std::cout << "FINISHED" << std::endl;
+        game = life::readStateFile(gameStateFile);
     }
     catch (...){
-        std::cout << "Error parsing the game state file" << std::endl;
+        std::cout << "Error raised, exiting" << std::endl;
     }
+    // run the game
+    while (game.getActive()){
+        system(clear);
+        game.displayCells();
+        game.updateCells();
+        std::this_thread::sleep_for(std::chrono::milliseconds(simulationSpeed * 10));   
+    }
+    std::cout << "FINISHED" << std::endl;
+
 }
