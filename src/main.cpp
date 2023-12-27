@@ -12,6 +12,11 @@
 
 
 int main(int argc, char** argv){
+    // validate a game state file was provided
+    if (argc != 2){
+        std::cout << "Error - This program accepts exactly one argument" << std::endl;
+        return -1;
+    }
     // determine the desired simulation speed, the time each frame should take in tens of milliseconds 
     int simulationSpeed = 0;
     std::string speedStr;
@@ -30,11 +35,6 @@ int main(int argc, char** argv){
         }
     }
     while (simulationSpeed == 0);
-    // validate a game state file was provided
-    if (argc != 2){
-        std::cout << "Error - This program accepts exactly one argument" << std::endl;
-        return -1;
-    }
       // attempt to create a game from the provided game state file
     std::string gameStateFile = argv[1];
     life::Game game;
@@ -50,6 +50,7 @@ int main(int argc, char** argv){
         game.displayCells();
         game.updateCells();
         std::this_thread::sleep_for(std::chrono::milliseconds(simulationSpeed * 10));   
+        std::cout << "End height: " << game.getHeight() << std::endl;
     }
     std::cout << "FINISHED" << std::endl;
 
