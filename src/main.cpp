@@ -50,7 +50,6 @@ int main(int argc, char** argv){
         game.displayCells();
         game.updateCells();
         std::this_thread::sleep_for(std::chrono::milliseconds(simulationSpeed * 10));   
-        std::cout << "End height: " << game.getHeight() << std::endl;
     }
     std::cout << "FINISHED" << std::endl;
 
