@@ -30,9 +30,8 @@ int main(int argc, char** argv){
             for (int j = 0; j < x; j++)
                 fileStream << ".";
             // create a newline if it's not the last line of the file
-            if (i < (y-1)){
+            if (i < (y-1))
                 fileStream << "\n";
-            }
         }
     }
     else{
