@@ -143,6 +143,19 @@ void life::Game::updateCells(){
     generation_++;
     int neighbors;
     int updates = 0;
+    bool topExpanded = false; // used to check if the top of the grid has already been expanded
+    bool bottomExpanded  = false; // used to check if the bottom of the grid has already be expaneded
+    // check if the grid needs to be expanded vertically
+    for (int i = 0; i < width_; i++){
+        if (getNeighbors(i, -1) == reproduction_ && !topExpanded){
+            addRow(DIRECTIONS_::NORTH);
+            topExpanded = true;
+        }
+        if (getNeighbors(i, height_) == reproduction_ && !bottomExpanded){
+            addRow(DIRECTIONS_::SOUTH);
+            bottomExpanded = true;
+        }
+    }
     // create a copy of the board to update the board to
     std::vector<std::vector<bool>> newCells = cellRows_;
     for (int y = 0; y < height_; y++){
@@ -160,8 +173,6 @@ void life::Game::updateCells(){
             }
         }
     }
-    // check if the grid to needs to be expanded vertically 
-    // check on the top
     // mark the game "inactive" if no transformations occured
     if (!updates){
         active_ = false;
@@ -169,24 +180,66 @@ void life::Game::updateCells(){
     cellRows_ = newCells;
 }
 
+// adds a new empty column to the grid
+void life::Game::addColumn(int direction){
+    width_++;
+    switch (direction){
+    case DIRECTIONS_::WEST:
+        // add a new dead cell to the right of each row
+        for (int i = 0; i < height_; i++)
+            cellRows_[i].push_back(false);
+        break;
+    case DIRECTIONS_::EAST:
+        // add a new dead cell to the left of each row
+        for (int i = 0; i < height_; i++)
+            cellRows_[i].insert(cellRows_[i].begin(), false);
+        break;
+    }
+
+}
+
+// adds an empty row to the grid
+void life::Game::addRow(int direction){
+    height_++;
+    // create a new empty row
+    std::vector<bool> newRow;
+    for (int i = 0; i < width_; i++)
+        newRow.push_back(false);
+    // append the empty row to the row list
+    switch (direction){
+        case DIRECTIONS_::NORTH:
+            // append the empty row to the top of the grid
+            cellRows_.insert(cellRows_.begin(), newRow);
+            break;
+        case DIRECTIONS_::SOUTH:
+            // append the empty tow to the bottom of the grid
+            cellRows_.push_back(newRow);
+    }
+}
+
 // getter methods
-// gets the number of live neighbors adjacent to a cell in a given positon, returns -1 if the position doesn't exist
+// retuns the cell at column x and row y
+bool life::Game::getCell(int x, int y){
+    return cellRows_[y][x];
+}
+
+
 int life::Game::getNeighbors(int x, int y){
-    if (x >= width_ || y >= height_ || x < 0 || y < 0){
+    if (x > width_ || y > height_ || x < -1 || y < -1){
         return -1;
     }
     int neighbors = 0;
-    // these reperesent index the row above and below the cell (if present) respectively
-    int topIndex = y; 
-    int bottomIndex = y;
+    // these reperesent index the row above and below the cell (if present) respectively. These are determined based on if the cell is in range
+    int topIndex = (y == -1) ? 0 : y; 
+    int bottomIndex = (y == height_) ? y-1 : y; 
     // check if there are any cells above this cell and check the cell directly above it so
-    if (y != 0){
+    if (y > 0){
         topIndex--;
         if (getCell(x, topIndex)) 
             neighbors++;
     }
     // check if there are any cells below this cell and check the cell below it so
-    if (y != height_ - 1){
+    if (y < height_-1){
         bottomIndex = y+1;
         if (getCell(x, bottomIndex))
             neighbors++;
@@ -205,9 +258,3 @@ int life::Game::getNeighbors(int x, int y){
     }
     return neighbors;
 }
-
-// gets the cell at a given location
-bool life::Game::getCell(int x, int y){
-    return cellRows_[y][x];
-}
-
