@@ -150,12 +150,12 @@ void life::Game::updateCells(){
             neighbors = getNeighbors(x, y);
              // if the cell is alive, mark the cell as dead if its neighbor count is lower than the underpopulation threshold, or if its neighbor count is higher than the overpopulation threshold
             if (getCell(x, y) && (neighbors < underpop_ || neighbors > overpop_)) {
-                newCells[x][y] = false;
+                newCells[y][x] = false;
                 updates++;
             }
             // if the cell is dead, make it alive if it has the requisite number of neighbors
             else if (!getCell(x, y) && neighbors == reproduction_){
-                newCells[x][y] = true;
+                newCells[y][x] = true;
                 updates++;
             }
         }
@@ -208,6 +208,6 @@ int life::Game::getNeighbors(int x, int y){
 
 // gets the cell at a given location
 bool life::Game::getCell(int x, int y){
-    return cellRows_[x][y];
+    return cellRows_[y][x];
 }
 
