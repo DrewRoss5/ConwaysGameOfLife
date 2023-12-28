@@ -126,11 +126,6 @@ life::Game::Game(int width, int height, std::vector<int> rules, std::vector<std:
     reproduction_ = rules[2];
 }
 
-// returns if a cell is alive based on its character
-bool life::Game::getCell(int x, int y){
-    return cellRows_[x][y];
-}
-
 // displays the current cells
 void life::Game::displayCells() const{
     for (std::vector<bool> row : cellRows_){
@@ -210,3 +205,9 @@ int life::Game::getNeighbors(int x, int y){
     }
     return neighbors;
 }
+
+// gets the cell at a given location
+bool life::Game::getCell(int x, int y){
+    return cellRows_[x][y];
+}
+
