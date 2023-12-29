@@ -243,11 +243,7 @@ void life::Game::addRow(int direction){
 }
 
 // getter methods
-// retuns the cell at column x and row y
-bool life::Game::getCell(int x, int y){
-    return cellRows_[y][x];
-}
-
+// returns the number of live neighbors a cell in column x and row y has
 int life::Game::getNeighbors(int x, int y){
     if (x > width_ || y > height_ || x < -1 || y < -1){
         return -1;
