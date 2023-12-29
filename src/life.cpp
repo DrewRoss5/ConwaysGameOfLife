@@ -28,6 +28,8 @@ life::Game life::readStateFile(std::string fileName){
     // game variables to be defined
     int width;
     int height;
+    int maxWidth;
+    int maxHeight;
     std::vector<std::vector<bool>> cells;
     // read each line from the given file
     std::ifstream fileStream(fileName);
@@ -42,18 +44,22 @@ life::Game life::readStateFile(std::string fileName){
         throw std::runtime_error("Invalid game state file -  File could not be read.");
     }
     fileStream.close();
-    // porse the width and height of the game grid
+    // porse the starting width and height of the game grid
     std::vector<std::string> dimensions = life::splitStr(lines[0], ", ");
-    if (dimensions.size() != 2){
+    if (dimensions.size() != 4){
         std::cout << "Invalid game state file - invalid game size." << std::endl;
         throw std::runtime_error("Invalid game state file - invalid game size.");
     }   
     try{
         width = std::stoi(dimensions[0]);
         height = std::stoi(dimensions[1]);
+        maxWidth = std::stoi(dimensions[2]);
+        maxHeight = std::stoi(dimensions[3]);
+        if ((maxWidth < width && maxWidth != 0) ||  (maxHeight < height && maxHeight != 0))
+            throw std::runtime_error("Invalid game state file - invalid game size.");
     }
     catch (...){
-        std::cout << "Invalid game state file - invalid game size." << std::endl;
+        std::cout << "Invalid game state file - invalid starting game size." << std::endl;
         throw std::runtime_error("Invalid game state file - invalid game size.");
     }
        // validate the number of lines (should be the specified height of the grid + 2) and raise an error if it's invalid
@@ -109,15 +115,17 @@ life::Game life::readStateFile(std::string fileName){
         }
         cells.push_back(row);
     }
-    return life::Game(width, height, rules, cells);
+    return life::Game(width, height, maxWidth, maxHeight, rules, cells);
 }
 
 // general constructor for the Game class
-life::Game::Game(int width, int height, std::vector<int> rules, std::vector<std::vector<bool>> cells){
+life::Game::Game(int width, int height, int maxWidth, int maxHeight, std::vector<int> rules, std::vector<std::vector<bool>> cells){
     generation_ = 0;
     active_ = true;
     width_ = width;
     height_  = height;
+    maxWidth_ = maxWidth;
+    maxHeight_ = maxHeight;
     cellRows_ = cells;
     // set the game's rules according to the given vector
     // we assume that the vector has already been validated by the readStateFile function
@@ -147,27 +155,31 @@ void life::Game::updateCells(){
     bool bottomExpanded  = false; 
     bool leftExpanded = false;
     bool rightExpanded = false;
-    // check if the grid needs to be expanded vertically
-    for (int i = 0; i < width_; i++){
-        if (getNeighbors(i, -1) == reproduction_ && !topExpanded){
-            addRow(DIRECTIONS_::NORTH);
-            topExpanded = true;
-        }
-        if (getNeighbors(i, height_) == reproduction_ && !bottomExpanded){
-            addRow(DIRECTIONS_::SOUTH);
-            bottomExpanded = true;
+    // check if the grid needs to be expanded vertically (if the maximum height hasn't been reached or is undefined)
+    if (height_ < maxHeight_ || maxHeight_ == 0){
+        for (int i = 0; i < width_; i++){
+            if (getNeighbors(i, -1) == reproduction_ && !topExpanded){
+                addRow(DIRECTIONS_::NORTH);
+                topExpanded = true;
+            }
+            if (getNeighbors(i, height_) == reproduction_ && !bottomExpanded){
+                addRow(DIRECTIONS_::SOUTH);
+                bottomExpanded = true;
+            }
         }
     }
     // check if the grid needs to be expanded horizontally
-    for (int i = 0; i < height_; i++){
-        if (getNeighbors(-1, i) && !leftExpanded){
-            addColumn(DIRECTIONS_::WEST);
-            leftExpanded = true;
-        }
-        if (getNeighbors(width_, i) && !rightExpanded){
-            addColumn(DIRECTIONS_::EAST);
-            rightExpanded = true;
+    if (width_ < maxWidth_ || maxWidth_ == 0){
+        for (int i = 0; i < height_; i++){
+            if (getNeighbors(-1, i) && !leftExpanded){
+                addColumn(DIRECTIONS_::WEST);
+                leftExpanded = true;
+            }
+            if (getNeighbors(width_, i) && !rightExpanded){
+                addColumn(DIRECTIONS_::EAST);
+                rightExpanded = true;
 
+            }
         }
     }
     // create a copy of the board to update the board to
@@ -235,7 +247,6 @@ void life::Game::addRow(int direction){
 bool life::Game::getCell(int x, int y){
     return cellRows_[y][x];
 }
-
 
 int life::Game::getNeighbors(int x, int y){
     if (x > width_ || y > height_ || x < -1 || y < -1){
