@@ -77,7 +77,6 @@ life::Game life::readStateFile(std::string fileName){
             throw std::runtime_error("Invalid game state file - invalid game rules.");
         }
         // get the range of survival condtions
-        std::vector<std::string> survivalStrs = splitStr(ruleStrs[1], "-");
         rules = {std::stoi(ruleStrs[0]), std::stoi(ruleStrs[1]), std::stoi(ruleStrs[2])};
     }
      catch (...){
