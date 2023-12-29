@@ -5,26 +5,33 @@
 
 int main(int argc, char** argv){
     std::string fileName;
-    int x, y; // the integers to define the size of the grid
+    int x, y, maxX, maxY; // the integers to define the size of the grid
     // validate and parse the two arguments
-    if (argc != 4){
-        std::cout << "This program accepts exactly three arguments, please run it again with three arguments" << std::endl;
+    if (argc != 6){
+        std::cout << argc << std::endl;
+        std::cout << "This program accepts exactly five arguments, please run it again with five arguments" << std::endl;
         return -1;
     }
     try{
         x = std::stoi(argv[1]);
         y = std::stoi(argv[2]);
-        fileName = argv[3];
+        maxX = std::stoi(argv[3]);
+        maxY = std::stoi(argv[4]);
+        fileName = argv[5];
     }
     catch(...){
         std::cout << "Invalid interger." << std::endl;
+        return -1;
+    }
+    if ((maxX < x && maxX != 0) || (maxY < y && maxY != 0)){
+        std::cout << "Maximum size may not be smaller than the starting size" << std::endl;
         return -1;
     }
     // create the file
     std::ofstream fileStream(fileName);
     if(fileStream.good()){
         // write the default rules and provided size to the file
-        fileStream << x << ", " << y << "\n2;3;3\n";
+        fileStream << x << ", " << y << ", " << maxX << ", " << maxY << "\n2;3;3\n";
         // write a blank line of size x for y rows
         for (int i = 0; i < y; i++){
             for (int j = 0; j < x; j++)
@@ -38,5 +45,4 @@ int main(int argc, char** argv){
         std::cout << "The file could not be created..." << std::endl;
     }
     fileStream.close();
-
 }
