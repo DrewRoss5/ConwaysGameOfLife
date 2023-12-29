@@ -23,12 +23,12 @@ namespace life{
         public:
             Game() : width_(0), height_(0), maxWidth_(0), maxHeight_(0), overpop_(3), underpop_(2), reproduction_(3), generation_(0), active_(false), cellRows_({}){} // default constructor
             Game(int width, int height, int maxWidth, int maxHeight, std::vector<int> rules, std::vector<std::vector<bool>> cells);
-            bool getCell(int x, int y);
             void displayCells() const;
             void updateCells();
             void addColumn(int direction);
             void addRow(int direction);
             //getter functions
+            bool getCell(int x, int y) {return cellRows_[y][x];}
             int getWidth() const {return width_;}
             int getHeight() const {return height_;}
             bool getActive() const {return active_;}
