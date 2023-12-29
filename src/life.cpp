@@ -143,8 +143,10 @@ void life::Game::updateCells(){
     generation_++;
     int neighbors;
     int updates = 0;
-    bool topExpanded = false; // used to check if the top of the grid has already been expanded
-    bool bottomExpanded  = false; // used to check if the bottom of the grid has already be expaneded
+    bool topExpanded = false; 
+    bool bottomExpanded  = false; 
+    bool leftExpanded = false;
+    bool rightExpanded = false;
     // check if the grid needs to be expanded vertically
     for (int i = 0; i < width_; i++){
         if (getNeighbors(i, -1) == reproduction_ && !topExpanded){
@@ -154,6 +156,18 @@ void life::Game::updateCells(){
         if (getNeighbors(i, height_) == reproduction_ && !bottomExpanded){
             addRow(DIRECTIONS_::SOUTH);
             bottomExpanded = true;
+        }
+    }
+    // check if the grid needs to be expanded horizontally
+    for (int i = 0; i < height_; i++){
+        if (getNeighbors(-1, i) && !leftExpanded){
+            addColumn(DIRECTIONS_::WEST);
+            leftExpanded = true;
+        }
+        if (getNeighbors(width_, i) && !rightExpanded){
+            addColumn(DIRECTIONS_::EAST);
+            rightExpanded = true;
+
         }
     }
     // create a copy of the board to update the board to
@@ -187,15 +201,14 @@ void life::Game::addColumn(int direction){
     case DIRECTIONS_::WEST:
         // add a new dead cell to the right of each row
         for (int i = 0; i < height_; i++)
-            cellRows_[i].push_back(false);
+            cellRows_[i].insert(cellRows_[i].begin(), false);
         break;
     case DIRECTIONS_::EAST:
         // add a new dead cell to the left of each row
         for (int i = 0; i < height_; i++)
-            cellRows_[i].insert(cellRows_[i].begin(), false);
+            cellRows_[i].push_back(false);
         break;
     }
-
 }
 
 // adds an empty row to the grid
@@ -245,13 +258,13 @@ int life::Game::getNeighbors(int x, int y){
             neighbors++;
     }
     // check all cells to the left of this cell if it isn't the leftmost cell
-    if (x != 0){
+    if (x > 0){
         for (int i = topIndex; i <= bottomIndex; i++)
             if (getCell(x-1, i))
                 neighbors++;
     }
     // check all cells to the right of this cell if it isn't the rightmost cell
-    if (x != width_ - 1){
+    if (x < width_ - 1){
         for (int i = topIndex; i <= bottomIndex; i++)
             if (getCell(x+1, i))
                 neighbors++;
