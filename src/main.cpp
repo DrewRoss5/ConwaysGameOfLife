@@ -20,13 +20,13 @@ int main(int argc, char** argv){
     // determine the desired simulation speed, the time each frame should take in tens of milliseconds 
     int simulationSpeed = 0;
     std::string speedStr;
-    std::cout << "What simulation speed would you like? (between 1 and 100, lower is faster)" << std::endl;
+    std::cout << "What simulation speed would you like? (between 1 and 95, higher is faster)" << std::endl;
     do{
         std::getline(std::cin, speedStr); 
         try{
             simulationSpeed = std::stoi(speedStr);
-            if (simulationSpeed < 1 || simulationSpeed > 100){
-                std::cout << "Please provide an integer between 1 and 100" << std::endl;
+            if (simulationSpeed < 1 || simulationSpeed > 95){
+                std::cout << "Please provide an integer between 1 and 95" << std::endl;
                 simulationSpeed = 0;
             }
         }
@@ -35,6 +35,7 @@ int main(int argc, char** argv){
         }
     }
     while (simulationSpeed == 0);
+    int frameDelay = 1000 - (simulationSpeed * 10);
       // attempt to create a game from the provided game state file
     std::string gameStateFile = argv[1];
     life::Game game;
@@ -49,7 +50,7 @@ int main(int argc, char** argv){
         system(clear);
         game.displayCells();
         game.updateCells();
-        std::this_thread::sleep_for(std::chrono::milliseconds(simulationSpeed * 10));   
+        std::this_thread::sleep_for(std::chrono::milliseconds(frameDelay));   
     }
     std::cout << "FINISHED" << std::endl;
 
