@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <stdexcept>
 #include "life.h"
 
 
@@ -40,15 +39,13 @@ life::Game life::readStateFile(std::string fileName){
             lines.push_back(lineBuf);
     }
     else{
-        std::cout << "Invalid game state file -  File could not be read." << std::endl;
-        throw std::runtime_error("Invalid game state file -  File could not be read.");
+        throw Game::ERROR_CODES::INVALID_FILE;
     }
     fileStream.close();
     // porse the starting width and height of the game grid
     std::vector<std::string> dimensions = life::splitStr(lines[0], ", ");
     if (dimensions.size() != 4){
-        std::cout << "Invalid game state file - invalid game size." << std::endl;
-        throw std::runtime_error("Invalid game state file - invalid game size.");
+        throw Game::ERROR_CODES::INVALID_GAME_SIZE;
     }   
     try{
         width = std::stoi(dimensions[0]);
@@ -56,32 +53,26 @@ life::Game life::readStateFile(std::string fileName){
         maxWidth = std::stoi(dimensions[2]);
         maxHeight = std::stoi(dimensions[3]);
         if ((maxWidth < width && maxWidth != 0) ||  (maxHeight < height && maxHeight != 0))
-            throw std::runtime_error("Invalid game state file - invalid game size.");
+            throw Game::ERROR_CODES::INVALID_GAME_SIZE;
     }
     catch (...){
-        std::cout << "Invalid game state file - invalid starting game size." << std::endl;
-        throw std::runtime_error("Invalid game state file - invalid game size.");
+        throw Game::ERROR_CODES::INVALID_GAME_SIZE;
     }
        // validate the number of lines (should be the specified height of the grid + 2) and raise an error if it's invalid
     if (lines.size() != height + 2){
-        std::cout << "Invalid game state file - too many or too few rows" << std::endl;
-        throw std::runtime_error("Invalid game state file - too many or too few rows");
+        throw Game::ERROR_CODES::INVALID_ROW_COUNT;
     }
      // parse the game's rules
     std::vector<int> rules;
     try{
-      
         std::vector<std::string> ruleStrs = life::splitStr(lines[1], ";");
         if (ruleStrs.size() != 3){
-            std::cout << "Invalid game state file - invalid game rules." << std::endl;
-            throw std::runtime_error("Invalid game state file - invalid game rules.");
+            throw Game::ERROR_CODES::INVALID_GAME_RULES;
         }
-        // get the range of survival condtions
         rules = {std::stoi(ruleStrs[0]), std::stoi(ruleStrs[1]), std::stoi(ruleStrs[2])};
     }
      catch (...){
-        std::cout << "Invalid game state file - invalid game rules." << std::endl;
-        throw std::runtime_error("Invalid game state file - invalid game rules.");
+        throw Game::ERROR_CODES::INVALID_GAME_RULES;
     }
     // parse the game map
     char chr;
@@ -91,11 +82,8 @@ life::Game life::readStateFile(std::string fileName){
         row.clear();
         rowIn = lines.at(i);
         // validate the length of the row, and throw an error if it's invalid
-        if (rowIn.length() != width){
-            int rowNum = i-2;
-            std::cout << "Invalid game state file - Invalid row size in row " << rowNum << std::endl;
-            throw std::runtime_error("Invalid game state file - Invalid row size in row " + rowNum);
-        }
+        if (rowIn.length() != width)
+            throw Game::ERROR_CODES::INVALID_ROW_SIZE;
         // add each character to the row
         for (int j = 0; j < width; j++){
             chr = rowIn.at(j);
@@ -107,8 +95,7 @@ life::Game life::readStateFile(std::string fileName){
                     row.push_back(false); // dead cells are displayed as blank space in the game, which is why a dot is changed to a blank space.
                     break;
                 default:
-                    std::cout << "Invalid game state file - illegal character: " << chr;
-                    throw std::runtime_error("Invalid game state file - illegal character: " + chr);
+                    throw Game::ERROR_CODES::ILLEGAL_CHAR;
                     break;
             }
         }
@@ -158,11 +145,11 @@ void life::Game::updateCells(){
     if (height_ < maxHeight_ || maxHeight_ == 0){
         for (int i = 0; i < width_; i++){
             if (getNeighbors(i, -1) == reproduction_ && !topExpanded){
-                addRow(DIRECTIONS_::NORTH);
+                addRow(NORTH);
                 topExpanded = true;
             }
             if (getNeighbors(i, height_) == reproduction_ && !bottomExpanded){
-                addRow(DIRECTIONS_::SOUTH);
+                addRow(SOUTH);
                 bottomExpanded = true;
             }
         }
@@ -171,11 +158,11 @@ void life::Game::updateCells(){
     if (width_ < maxWidth_ || maxWidth_ == 0){
         for (int i = 0; i < height_; i++){
             if (getNeighbors(-1, i) && !leftExpanded){
-                addColumn(DIRECTIONS_::WEST);
+                addColumn(WEST);
                 leftExpanded = true;
             }
             if (getNeighbors(width_, i) && !rightExpanded){
-                addColumn(DIRECTIONS_::EAST);
+                addColumn(EAST);
                 rightExpanded = true;
 
             }
@@ -209,16 +196,16 @@ void life::Game::updateCells(){
 void life::Game::addColumn(int direction){
     width_++;
     switch (direction){
-    case DIRECTIONS_::WEST:
-        // add a new dead cell to the right of each row
-        for (int i = 0; i < height_; i++)
-            cellRows_[i].insert(cellRows_[i].begin(), false);
-        break;
-    case DIRECTIONS_::EAST:
-        // add a new dead cell to the left of each row
-        for (int i = 0; i < height_; i++)
-            cellRows_[i].push_back(false);
-        break;
+        case WEST:
+            // add a new dead cell to the right of each row
+            for (int i = 0; i < height_; i++)
+                cellRows_[i].insert(cellRows_[i].begin(), false);
+            break;
+        case EAST:
+            // add a new dead cell to the left of each row
+            for (int i = 0; i < height_; i++)
+                cellRows_[i].push_back(false);
+            break;
     }
 }
 
@@ -231,11 +218,11 @@ void life::Game::addRow(int direction){
         newRow.push_back(false);
     // append the empty row to the row list
     switch (direction){
-        case DIRECTIONS_::NORTH:
+        case NORTH:
             // append the empty row to the top of the grid
             cellRows_.insert(cellRows_.begin(), newRow);
             break;
-        case DIRECTIONS_::SOUTH:
+        case SOUTH:
             // append the empty tow to the bottom of the grid
             cellRows_.push_back(newRow);
     }
