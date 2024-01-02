@@ -44,25 +44,25 @@ int main(int argc, char** argv){
     }
     catch (int errCode){
         switch (errCode){
-        case life::Game::INVALID_FILE:
-            std::cerr << "Error - The game state file could not be read!" << std::endl;
-            break;
-        case life::Game::INVALID_GAME_SIZE:
-            std::cerr << "Error - The game size could not be parsed!" << std::endl;
-            break;
-        case life::Game::INVALID_GAME_RULES:
-            std::cerr << "Error - The game rules could not be parsed!" << std::endl;
-            break;
-        case life::Game::INVALID_ROW_COUNT:
-            std::cerr << "Error - Too many or to few rows" << std::endl;
-            break;
-        case life::Game::INVALID_ROW_SIZE:
-            std::cerr << "Error - Invalid Row Size!" << std::endl;
-            break;
-        default:
-            std::cerr << "Error encountered while parsing the game state file" << std::endl;
-            break;
-        }
+            case life::Game::INVALID_FILE:
+                std::cerr << "Error - The game state file could not be read!" << std::endl;
+                break;
+            case life::Game::INVALID_GAME_SIZE:
+                std::cerr << "Error - The game size could not be parsed!" << std::endl;
+                break;
+            case life::Game::INVALID_GAME_RULES:
+                std::cerr << "Error - The game rules could not be parsed!" << std::endl;
+                break;
+            case life::Game::INVALID_ROW_COUNT:
+                std::cerr << "Error - Too many or to few rows" << std::endl;
+                break;
+            case life::Game::INVALID_ROW_SIZE:
+                std::cerr << "Error - Invalid Row Size!" << std::endl;
+                break;
+            default:
+                std::cerr << "Error encountered while parsing the game state file" << std::endl;
+                break;
+            }
     }
     // run the game
     while (game.getActive()){
