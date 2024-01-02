@@ -21,6 +21,7 @@ namespace life{
             bool active_;
             std::vector<std::vector<bool>> cellRows_;
         public:
+            enum ERROR_CODES{INVALID_FILE = 100, INVALID_GAME_SIZE, INVALID_ROW_COUNT, INVALID_GAME_RULES, INVALID_ROW_SIZE, ILLEGAL_CHAR};
             Game() : width_(0), height_(0), maxWidth_(0), maxHeight_(0), overpop_(3), underpop_(2), reproduction_(3), generation_(0), active_(false), cellRows_({}){} // default constructor
             Game(int width, int height, int maxWidth, int maxHeight, std::vector<int> rules, std::vector<std::vector<bool>> cells);
             void displayCells() const;
