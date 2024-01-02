@@ -4,7 +4,7 @@
 #include "life.h"
 
 // determine the system call to make to clear the screen depending on the user's OS
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     const char* clear = "cls";
 #else
     const char* clear = "clear";
@@ -42,8 +42,27 @@ int main(int argc, char** argv){
     try{
         game = life::readStateFile(gameStateFile);
     }
-    catch (...){
-        std::cout << "Error raised, exiting" << std::endl;
+    catch (int errCode){
+        switch (errCode){
+        case life::Game::INVALID_FILE:
+            std::cerr << "Error - The game state file could not be read!" << std::endl;
+            break;
+        case life::Game::INVALID_GAME_SIZE:
+            std::cerr << "Error - The game size could not be parsed!" << std::endl;
+            break;
+        case life::Game::INVALID_GAME_RULES:
+            std::cerr << "Error - The game rules could not be parsed!" << std::endl;
+            break;
+        case life::Game::INVALID_ROW_COUNT:
+            std::cerr << "Error - Too many or to few rows" << std::endl;
+            break;
+        case life::Game::INVALID_ROW_SIZE:
+            std::cerr << "Error - Invalid Row Size!" << std::endl;
+            break;
+        default:
+            std::cerr << "Error encountered while parsing the game state file" << std::endl;
+            break;
+        }
     }
     // run the game
     while (game.getActive()){
