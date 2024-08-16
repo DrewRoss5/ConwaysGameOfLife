@@ -11,5 +11,7 @@ By default a game state file has no live cells in it, beneath the firsst two lin
 # Playing the game
 To play the game, run the comiled binary passing the game state file as an argument. <br>For example <code>./gameoflife testfile.txt</code>. The game asks for a simulation speed, this determines how many milliseconds each "generation" is displayed for. For example a simulation speed of 95 will reneder a new generation every 50 milliseconds, but a simulation speed of 1 will take 990 milliseconds to render each generation.
 # Contributing
-This repo is not currently accepting outside code contributions, but ideas for changes and improvements are more than welcome at drew.ottesen@protonmail.com.
+The main branch of this repository is not accepting direct code contributions at this time. You're encouraged to fork the repository and make your changes there. If you have a significant change that you believe should be incorporated into the main branch, feel free to discuss it by opening an issue.
+
+
 
